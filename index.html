@@ -1,7 +1,110 @@
 <header>
+  <style>
+    .square {
+      border-style: solid;
+      border-radius: 1px;
+      height:20px;
+      width:20px;
+    } 
+     body {
+      background-image: url("http://www.pxleyes.com/images/contests/real%20retrogames/fullsize/real%20retrogames_4c2b9be0c6058_hires.jpg"); 
+      height: 250px;
+      width: 750px;
+}
+  </style>
   <title>jason's page</title>
 </header>
 
 <body>
-<h1>hi</h1>
+<table id = "board"></table>
+  <script>
+    var rows = 10;
+var cols = 10;
+var mines = 10;
+var gameover = "false";
+console.log("rows: " + rows);
+console.log("cols: " + cols);
+var board = document.getElementById("board");
+var squares = intializeBoard(board, rows, cols);
+GenMines(squares);
+
+function randInt(Min, Max) {
+  return Math.floor((Math.random() * (Max - Min)) + Min);
+}
+
+function GenMines(sqares) {
+  for (var r = 0; r < rows; r++) {
+    for (var c = 0; c < cols; c++) {
+      var elem = squares[r][c];
+      elem.setAttribute("mine", "N");
+    }
+  }
+  var count = mines;
+  while (count > 0) {
+    var mineRow = randInt(0, rows - 1);
+    var mineCol = randInt(0, rows - 1);
+    var elem = squares[mineRow][mineCol];
+    if (elem.getAttribute("mine")) {
+      elem.setAttribute("mine", "M");
+      console.log(mineRow, mineCol);
+
+    }
+    count--;
+  }
+}
+
+function checkMine(row, col) {
+  var elem = squares[row][col];
+  if (elem.getAttribute("mine") == "M") {
+    return true;
+  }
+  return false;
+}
+
+function MineClick(row, col) {
+  if (checkMine(row, col)) {
+    squares[row][col].style.backgroundColor = "red";
+    squares[row][col].innerHTML = "X";
+    alert("You clicked a mine! Game over :(");
+    gameover = "true";
+  } else {
+    checkTouching(row, col);
+  }
+}
+
+function intializeBoard(table, rows, cols) {
+  var newarr = [];
+  for (var r = 0; r < rows; r++) {
+    var row = table.insertRow(r);
+    newarr[r] = [];
+    for (var c = 0; c < cols; c++) {
+      var cell = row.insertCell(c);
+      cell.setAttribute("class", "square");
+      newarr[r][c] = cell;
+      cell.row = r;
+      cell.col = c;
+      cell.onclick = function() {
+        if (gameover == "false") {
+          MineClick(this.row, this.col);
+        }
+      }
+    }
+  }
+  return newarr;
+}
+
+function checkTouching(row, col) {
+  var mineCount = 0;
+  for (var r = row - 1; r <= row + 1; r++) {
+    for (var c = col - 1; c <= col + 1; c++) {
+      if (r > 0 && r < rows && c > 0 && c < cols) {
+        if (checkMine(r, c)) {
+          mineCount++;
+        }
+      }
+    }
+  }
+  squares[row][col].innerHTML = mineCount;
+}
+  </script>
 </body>
